@@ -5,6 +5,8 @@ require("dotenv")
 const bodyParser = require('body-parser')
 const cors = require("cors")
 
+const PORT = process.env.PORT || 3000
+
 app.use(bodyParser.json())
 app.use(cors())
 
@@ -15,6 +17,12 @@ const likedVidRoute = require("./routes/likedVideos.route")
 const watchLaterRoute = require("./routes/watchLater.route")
 
 const playlistRoute = require("./routes/playlist.route")
+
+const loginRoute = require("./routes/auth.route")
+
+const userRoute = require("./routes/user.route")
+
+
 
 
 const dbconnection = async () => {
@@ -40,8 +48,10 @@ app.use("/videos", vidRoute)
 app.use("/likedvideos", likedVidRoute)
 app.use("/watchlater", watchLaterRoute)
 app.use("/playlist", playlistRoute)
+app.use("/register", loginRoute)
+app.use("/user", userRoute)
 
 
-app.listen(3000, ()=>{
+app.listen(PORT, ()=>{
   console.log("Server Connected")
 })

@@ -2,52 +2,61 @@ const express = require('express');
 const router = express.Router();
 
 const LikedVideo = require("../models/likedVideos.model")
+const verify = require("../middlewares/verifyToken")
+const User = require("../models/user.model")
 
-router.get('/', async(req ,res)=>{
+router.get('/', verify, async (req, res) => {
 
-  try{
-    const prd = await LikedVideo.find()
-    res.json(prd)
-  }catch(err){
+  try {
+    const videos = await LikedVideo.find({ user: req.user._id })
+    res.json(videos)
+  } catch (err) {
     console.log("err", err)
   }
 
 });
 
 
-router.post('/', async (req, res)=>{
-  console.log(req.body)
+
+
+router.post('/',verify, async (req, res) => {
+  console.log(req.user._id)
 
   const addVid = req.body
-    const newVideo = new LikedVideo(
-      addVid
-      
-    )
-  
-    try {
-      const vidData = await newVideo.save();
-      res.json(vidData);
-    } catch (error) {
-      res.status(400).json({ success: false, message: error });
-    }
+  const newVideo = new LikedVideo(
+  {  ...addVid,
+    user: req.user._id}
+
+  )
+
+  try {
+    const vidData = await newVideo.save();
+    res.json(vidData);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error });
+  }
 
 })
 
 
-router.delete('/:vidId', async(req, res)=>{
-  try{
-    const removedPrd = await LikedVideo.remove({_id:req.params.vidId})
-    
-    const newPrd = await LikedVideo.find();
-    res.json(newPrd);
-    
+router.delete('/:vidId', verify, async (req, res) => {
+
+  try {
+
+    console.log(req.params.vidId)
+
+    const removedPrd = await LikedVideo.remove({ _id: req.params.vidId , user: req.user._id})
+
+    const newVids = await LikedVideo.find({ user: req.user._id });
+    res.json(newVids);
+
   }
-  
-  catch(err){
-    res.json({message:err})
+
+  catch (err) {
+    res.json({ message: err })
     console.log(err)
   }
-  
+
 })
 
 module.exports = router

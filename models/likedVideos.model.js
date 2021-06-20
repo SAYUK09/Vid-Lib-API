@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const LikedVideoSchema = new mongoose.Schema({ 
+const LikedVideoSchema = new mongoose.Schema({  user:{type:mongoose.Schema.Types.ObjectId, ref:"User"},
   thumbnail: String,
   title:String,
   videoURL : String,

@@ -38,7 +38,7 @@ router.patch('/:vidId', async(req, res)=>{
   try{
     const updatedPrd = await Playlist.findOneAndUpdate({_id : req.params.vidId}, {
       // $set:{videos:req.body.videos}
-      {$push :{ vidID:{$each:[1,2,]}}}
+      $push :{ vidID:{$each:[1,2,]}}
     })
 
     const newVid = await Playlist.find();
