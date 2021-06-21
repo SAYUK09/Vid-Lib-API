@@ -1,54 +1,110 @@
 const express = require('express');
 const router = express.Router();
-
+const verify = require("../middlewares/verifyToken")
 const Playlist = require("../models/playlist.model")
 
-router.get('/', async(req ,res)=>{
+router.get('/', verify, async (req, res) => {
 
-  try{
-    const prd = await Playlist.find()
-    res.json(prd)
-  }catch(err){
+  try {
+    const videos = await Playlist.find({ user: req.user._id })
+    res.json(videos)
+    
+  } catch (err) {
     console.log("err", err)
   }
 
 });
 
 
-router.post('/', async (req, res)=>{
+router.post('/', verify, async (req, res) => {
   console.log(req.body)
 
   const addVid = req.body
-    const newVideo = new Playlist(
-      addVid
-      
-    )
-  
-    try {
-      const vidData = await newVideo.save();
-      res.json(vidData);
-    } catch (error) {
-      res.status(400).json({ success: false, message: error });
+  console.log(addVid)
+  const newVideo = new Playlist(
+    {
+
+      ...addVid,
+      user: req.user._id
+
     }
+  )
+
+  try {
+    const vidData = await newVideo.save({ user: req.user._id });
+    res.json(vidData);
+  } catch (error) {
+    res.status(400).json({ success: false, message: error });
+  }
 
 })
 
+router.delete("/:itemId", verify ,async (req, res) => {
+   try {
+      const removeItem = await Playlist.remove({ _id: req.params.itemId , user: req.user._id});
 
-router.patch('/:vidId', async(req, res)=>{
-  try{
-    const updatedPrd = await Playlist.findOneAndUpdate({_id : req.params.vidId}, {
-      // $set:{videos:req.body.videos}
-      $push :{ vidID:{$each:[1,2,]}}
-    })
+      const newVid = await Playlist.find({ _id: req.params.itemId , user: req.user._id});
+      res.json(newVid);
 
-    const newVid = await Playlist.find();
-    res.json(newVid);
-    console.log(newVid)
+     
+   } catch (err) {
+      res.json({ message: err });
+   }
+});
 
-  }catch(err){
-    
-    res.json({message:err})
+router.post("/delete", verify, async (req, res) => {
+  try {
+    let { playlistId, videoId } = req.body
+    const playlist = await Playlist.findById({ playlistId, user: req.user._id })
+
+    console.log(playlist, "playlist")
+
+
+    let newdata = { ...playlist, videos: playlist.videos.filter((item) => item._id !== videoId) }
+
+
+    let data = extend(playlist, newdata);
+
+    const savedData = await data.save()
+
+    console.log(savedData)
+
+    res.json(savedData)
+  } catch (err) {
+    res.json(err);
     console.log(err)
+
+  }
+})
+
+
+router.post("/update/:vidId", verify, async (req, res) => {
+  try {
+    const playlist = await Playlist.findById({ user: req.user._id, _id: req.params.vidId });
+
+
+    const oldVids = playlist.videos
+
+
+    const newVid = [...oldVids, req.body.video]
+
+
+    const savedPlaylist = await Playlist.updateOne({
+      user: req.user._id, _id: req.params.vidId
+
+    }, {
+        $set: { videos: newVid }
+      })
+
+
+    const getPlaylist = await Playlist.findById({ user: req.user._id, _id: req.params.vidId });
+
+
+    res.json(getPlaylist);
+  } catch (err) {
+    res.json({ message: err });
+    console.log(err)
+
   }
 })
 

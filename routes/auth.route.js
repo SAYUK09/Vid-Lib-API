@@ -20,8 +20,10 @@ router.post("/signup", async (req, res) => {
   if (error) return res.send(error.details[0].message).status(401)
 
   //check if email exists
-  const emailExist = await User.findOne({ email: req.body.email });
-  if (emailExist) return res.status(400).send("Email already exist, Log In");
+   const emailExist = await User.findOne({ email: req.body.email });
+  if (emailExist) return res.send("Email already exist, Log In");
+  console.log(emailExist, "37")
+
 
   //hash password
   const salt = await bcrypt.genSalt(10);
@@ -32,6 +34,9 @@ router.post("/signup", async (req, res) => {
     email: req.body.email,
     password: hashedPassword,
   });
+
+ 
+  
   try {
     const savedUser = await user.save();
     res.send({ User: savedUser._id });

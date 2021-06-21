@@ -1,28 +1,24 @@
 const mongoose = require("mongoose");
 
-
-// const Video = require("./videos.model")
-// console.log(Video, "lalallalalalala")
-
-
-
 const PlaylistSchema = new mongoose.Schema(
-  {playlist :{
-  name : String , 
-  videos : [{ 
-  thumbnail: String,
-  title:String,
-  videoURL : String,
-  description : String,
-  category: String,
-  channel: String,
-  runTime : {mins : Number, sec:Number}
-    
-}]}
+  {
 
-   
-  
-})
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    name: String,
+    videos: [{
+      thumbnail: String,
+      title: String,
+      videoURL: String,
+      description: String,
+      category: String,
+      channel: String,
+      runTime: { mins: Number, sec: Number }
+
+    }]
+
+
+
+  })
 
 
 // const PlaylistSchema = new mongoose.Schema(
@@ -35,7 +31,7 @@ const PlaylistSchema = new mongoose.Schema(
 //   category: String,
 //   channel: String,
 //   runTime : {mins : Number, sec:Number}
-    
+
 // }]
 // })
 

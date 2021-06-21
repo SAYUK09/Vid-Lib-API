@@ -35,7 +35,7 @@ router.post('/', verify, async (req, res) => {
 
 })
 
-router.delete('/:vidId', async (req, res) => {
+router.delete('/:vidId', verify, async (req, res) => {
   try {
     const removedPrd = await WatchLaterVideo.remove({ _id: req.params.vidId,user: req.user._id })
 
